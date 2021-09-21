@@ -8,7 +8,7 @@ let tweets = [
         url: 'https://image.shutterstock.com/image-photo/people-joined-hands-team-600w-754453969.jpg'
     },
     {
-        id: 1,
+        id: '2',
         text: '두번째 트윗 입니다!',
         createdAt: Date.now().toString(),
         name: 'Cindy',
