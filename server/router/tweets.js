@@ -23,10 +23,6 @@ let tweets = [
 
 // GET /tweets
 // GET /tweets?username=:username
-// GET /tweets/:id
-// POST /tweets
-// PUT /tweets/:id
-// DELETE /tweets/:id
 router.get('/', (req, res, next) => {
     const username = req.query.username
     const data = username
@@ -34,7 +30,7 @@ router.get('/', (req, res, next) => {
     : tweets
     res.status(200).send(data)
 })
-
+// GET /tweets/:id
 router.get('/:id', (req, res, next) => {
     const id = req.params.id
     const tweet = tweets.find(tweet => tweet.id === id)
@@ -46,6 +42,7 @@ router.get('/:id', (req, res, next) => {
     
 })
 
+// POST /tweets
 router.post('/', (req, res, next) => {
     const {text, name, username} = req.body
     const tweet = {
@@ -59,6 +56,7 @@ router.post('/', (req, res, next) => {
     res.status(201).json(tweet)
 })
 
+// PUT /tweets/:id
 router.put('/:id', (req, res, next) => {
     const id = req.params.id
     const { text } = req.body
@@ -71,6 +69,7 @@ router.put('/:id', (req, res, next) => {
     }
 })
 
+// DELETE /tweets/:id
 router.delete('/:id', (req, res, next) => {
     const id = req.params.id
     tweets = tweets.filter(tweet => tweet.id !== id)
