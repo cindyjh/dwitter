@@ -75,7 +75,7 @@ function createJwtToken(payload, options) {
     return jwt.sign(payload, secret,
         {
             ...options,
-            expiresIn: '2d' // seconds
+            expiresIn: '2d' // 2일
         }
     )
 }
