@@ -9,7 +9,6 @@ import { validate } from '../middleware/validator.js'
 const router = express.Router()
 
 const validateTweet = [
-    param('id').toInt(),
     body('text').trim().isLength({min: 3}).withMessage('text should be at least 3 characters.'),
 ]
 

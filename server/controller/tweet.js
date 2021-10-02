@@ -10,7 +10,7 @@ export async function getTweets(req, res) {
 }
 
 export async function getTweet(req, res, next) {
-    const id = req.params.id
+    const id = parseInt(req.params.id)
     const tweet = await tweetRepository.getById(id)
     if (tweet) {
         res.status(200).send(tweet)
@@ -27,7 +27,7 @@ export async function createTweet(req, res, next) {
 }
 
 export async function updateTweet(req, res, next) {
-    const id = req.params.id
+    const id = parseInt(req.params.id)
     const { text } = req.body
     
     const tweet = await tweetRepository.update(id, text)
@@ -39,7 +39,7 @@ export async function updateTweet(req, res, next) {
 }
 
 export async function deleteTweet(req, res, next) {
-    const id = req.params.id
+    const id = parseInt(req.params.id)
     await tweetRepository.removes(id)
     res.sendStatus(204)
 }
