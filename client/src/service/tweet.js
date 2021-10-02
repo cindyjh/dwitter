@@ -36,7 +36,7 @@ export default class TweetService {
     return this.http.fetch(`/tweets/${tweetId}`, {
       method: "PUT",
       headers: this.getHeaders(),
-      body: JSON.stringify(text)
+      body: JSON.stringify({ text })
     })
   }
 
