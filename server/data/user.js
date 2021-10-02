@@ -1,12 +1,12 @@
 let users = [
     {
-        id: '1',
+        id: 1,
         username: 'cindy',
         password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
         createdAt: new Date().toString(),
     },
     {
-        id: '2',
+        id: 2,
         username: 'cindy2',
         password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
         createdAt: new Date().toString(),
