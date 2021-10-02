@@ -48,26 +48,20 @@ export async function login(req, res) {
     res.status(200).json({ username, token })
 }
 
+/**
+ * application이 실행이 될 때 기존에 가지고 있는 token이 있다면 이 token이 유효한지 검증해주는 용도의 API
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function me(req, res) {
-    const { username, password } = req.body
-    
-    const bcryptedPassword = bcryptPassword(password)
-
-    const user = await userRepository.get(
-        username,
-        bcryptedPassword
-    )
-
+    const userId = req.user_id
+    const user = await userRepository.findById(userId)
     if (!user) {
-        res.sendStatus(401)
+        return res.status(404).json({ message: 'User not found' })
     }
 
-    const token = createJwtToken(createUserJwtPayload(user.id))
-
-    res.status(200).json({
-        'username': username,
-        'token': token
-    })
+    res.status(200).json({ token: req.token, username: user.username })
 }
 
 function createUserJwtPayload(userId) {
@@ -81,7 +75,7 @@ function createJwtToken(payload, options) {
     return jwt.sign(payload, secret,
         {
             ...options,
-            expiresIn: 2 // seconds
+            expiresIn: '2d' // seconds
         }
     )
 }
