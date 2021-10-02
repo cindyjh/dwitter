@@ -1,22 +1,22 @@
 import * as userRepository from './user.js'
 let tweets = [
     {
-        id: '1',
+        id: 1,
         text: '첫 번째 트윗 입니다!',
         createdAt: new Date().toString(),
-        userId: '1',
+        userId: 1,
     },
     {
-        id: '2',
+        id: 2,
         text: '두번째 트윗 입니다!',
         createdAt: new Date().toString(),
-        userId: '1',
+        userId: 1,
     },
     {
-        id: '3',
+        id: 3,
         text: '세번째 트윗 입니다!',
         createdAt: new Date().toString(),
-        userId: '2',
+        userId: 2,
     },
 ]
 
