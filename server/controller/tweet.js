@@ -27,6 +27,7 @@ export async function createTweet(req, res, next) {
 }
 
 export async function updateTweet(req, res, next) {
+    // TODO: 본인이 만든 tweet만 업데이트 가능해야겠지.
     const id = parseInt(req.params.id)
     const { text } = req.body
     
@@ -39,6 +40,8 @@ export async function updateTweet(req, res, next) {
 }
 
 export async function deleteTweet(req, res, next) {
+    // TODO: 관리자이거나 본인이 만든 tweet만 업데이트 가능해야겠지.
+    // TODO: data를 완전히 지우는게 아니라 deleted_at을 넣어서 soft delete를 해주면 더 좋겠다.
     const id = parseInt(req.params.id)
     await tweetRepository.removes(id)
     res.sendStatus(204)
