@@ -27,22 +27,38 @@ export async function createTweet(req, res, next) {
 }
 
 export async function updateTweet(req, res, next) {
-    // TODO: 본인이 만든 tweet만 업데이트 가능해야겠지.
     const id = parseInt(req.params.id)
     const { text } = req.body
-    
-    const tweet = await tweetRepository.update(id, text)
-    if (tweet) {
-        res.status(200).json(tweet)
-    } else {
-        res.status(404).json({message: `Tweet id(${id}) not found`})
+    const userId = req.user_id
+    const tweet = await tweetRepository.getById(id)
+    // 없는 트윗을 업데이트 할 수 없다
+    if (!tweet) {
+        return res.status(404).json({message: `Tweet id(${id}) not found`})
     }
+    // 본인이 만든 tweet만 업데이트 가능 해야 한다.
+    if (tweet.userId !== userId) {
+        return res.sendStatus(403)
+    }
+
+    const updatedTweet = await tweetRepository.update(id, text)
+    res.status(200).json(updatedTweet)
 }
 
 export async function deleteTweet(req, res, next) {
-    // TODO: 관리자이거나 본인이 만든 tweet만 업데이트 가능해야겠지.
     // TODO: data를 완전히 지우는게 아니라 deleted_at을 넣어서 soft delete를 해주면 더 좋겠다.
     const id = parseInt(req.params.id)
+    const userId = req.user_id
+
+    const tweet = await tweetRepository.getById(id)
+    // 없는 트윗을 삭제 할 수 없다
+    if (!tweet) {
+        return res.status(404).json({message: `Tweet id(${id}) not found`})
+    }
+    // 본인이 만든 tweet만 샥제 가능 해야 한다.
+    if (tweet.userId !== userId) {
+        return res.sendStatus(403)
+    }
+
     await tweetRepository.removes(id)
     res.sendStatus(204)
 }
