@@ -13,19 +13,14 @@ const validateTweet = [
 
 // GET /tweets
 // GET /tweets?username=:username
-router.get('/', 
-    
-validate
-    , tweetController.getTweets)
+router.get('/', validate, tweetController.getTweets)
 // GET /tweets/:id
-router.get('/:id', validate
-    , tweetController.getTweet)
+router.get('/:id', validate, tweetController.getTweet)
 // POST /tweets
 router.post('/', validateTweet, validate, tweetController.createTweet)
 // PUT /tweets/:id
 router.put('/:id', validateTweet, validate, tweetController.updateTweet)
 // DELETE /tweets/:id
-router.delete('/:id', validate
-    , tweetController.deleteTweet)
+router.delete('/:id', validate, tweetController.deleteTweet)
 
 export default router
