@@ -51,7 +51,7 @@ export async function create(userId, text) {
         userId,
     }
     tweets = [tweet, ...tweets] // tweets 앞에 추가를 해준다.
-    return tweet
+    return getById(tweet.id)
 }
 
 export async function update(id, text) {
@@ -59,7 +59,7 @@ export async function update(id, text) {
     if (tweet) {
         tweet.text = text
     }
-    return tweet
+    return getById(tweet.id)
 }
 
 export async function removes(id) {
