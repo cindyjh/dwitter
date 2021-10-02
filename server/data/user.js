@@ -1,5 +1,3 @@
-
-
 let users = [
     {
         id: '1',
@@ -13,9 +11,13 @@ export async function findByUsername(username) {
     return users.find(user => user.username === username)
 }
 
+export async function findById(id) {
+    return users.find(user => user.id === id)
+}
+
 export async function create(userInfo) {
     const user = {
-        id: Math.max(...users.map(user => user.id)),
+        id: Math.max(...users.map(user => user.id)) + 1,
         ...userInfo,
         createdAt: Date.now().toString(),
         updatedAt: Date.now().toString(),
