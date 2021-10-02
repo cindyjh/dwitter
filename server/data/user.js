@@ -22,6 +22,6 @@ export async function create(userInfo) {
     }
 
     users.push(user)
-    return users
+    return user
 }
 
