@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+
 
 let users = [
     {
@@ -9,20 +9,14 @@ let users = [
     }
 ]
 
-export async function validateUsername(username) {
-    const duplicateUser = users.filter(user => user.username === username)
-    return duplicateUser.length === 0
+export async function findByUsername(username) {
+    return users.find(user => user.username === username)
 }
 
-export async function create(username, password, name, email, url) {
-    const bcryptedPassword = bcryptPassword(password)
+export async function create(userInfo) {
     const user = {
         id: Math.max(...users.map(user => user.id)),
-        username,
-        bcryptedPassword,
-        name,
-        email,
-        url,
+        ...userInfo,
         createdAt: Date.now().toString(),
         updatedAt: Date.now().toString(),
     }
@@ -31,11 +25,3 @@ export async function create(username, password, name, email, url) {
     return users
 }
 
-export async function get(username, password) {
-    const bcryptedPassword = bcryptPassword(password)
-    return users.filter(user => user.username === username && user.password === bcryptedPassword)
-}
-
-function bcryptPassword(password) {
-    return bcrypt.hashSync(password, 10)
-}

@@ -1,5 +1,6 @@
 import * as userRepository from '../data/user.js'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 export async function signup(req, res) {
     const { 
@@ -10,43 +11,41 @@ export async function signup(req, res) {
         url
     } = req.body
     // 아이디 중복 체크
-    const validUsername = await userRepository.validateUsername(username)
-    if (!validUsername) {
+    const found = await userRepository.findByUsername(username)
+    if (found) {
         return res.status(409).json({
-            message: 'User already exist.'
+            message: `${username} already exist.`
         })
     }
-
-    const user = await userRepository.create(
+    const hashed = bcryptPassword(password)
+    const user = await userRepository.create({
         username,
-        password,
+        password: hashed,
         name,
         email,
         url
-    )
-    res.status(201).json(user)
+    })
+
+    const token = createJwtToken(createUserJwtPayload(user.id))
+    res.status(201).json({ token, username })
 }
 
 export async function login(req, res) {
     const { username, password } = req.body
-    
-    const user = await userRepository.get(
-        username,
-        password
-    )
 
+    const user = await userRepository.findByUsername(username)
     if (!user) {
-        return res.sendStatus(401)
+        // user or password로 하는 이유는 보안을 위해서이다.
+        return res.status(401).json({ message: 'Invalid user or password'})
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password)
+    if (!isValidPassword) {
+        return res.status(401).json({ message: 'Invalid user or password'})
     }
 
-    const token = createJwtToken({
-        'username': username
-    })
+    const token = createJwtToken(createUserJwtPayload(user.id))
 
-    res.status(200).json({
-        'username': username,
-        'token': token
-    })
+    res.status(200).json({ username, token })
 }
 
 export async function me(req, res) {
@@ -63,14 +62,18 @@ export async function me(req, res) {
         res.sendStatus(401)
     }
 
-    const token = createJwtToken({
-        'username': username
-    })
+    const token = createJwtToken(createUserJwtPayload(user.id))
 
     res.status(200).json({
         'username': username,
         'token': token
     })
+}
+
+function createUserJwtPayload(userId) {
+    return {
+        id: userId
+    }
 }
 
 function createJwtToken(payload, options) {
@@ -81,4 +84,8 @@ function createJwtToken(payload, options) {
             expiresIn: 2 // seconds
         }
     )
+}
+
+function bcryptPassword(password) {
+    return bcrypt.hashSync(password, 10)
 }
