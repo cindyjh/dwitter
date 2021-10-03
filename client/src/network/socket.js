@@ -4,6 +4,8 @@ import socket from 'socket.io-client'
 export default class Socket {
     constructor(baseURL, getAccessToken) {
         this.io = socket(baseURL, {
+            // socket에서 표준으로 정한 auth를 통해 token을 전달하도록 한다.
+            // 만약 query로 보내게 되면 브라우저 상에 token이 보이고, 로그에도 남을 수 있다.
             auth: (cb) => cb({ token: getAccessToken() }),
         })
 
