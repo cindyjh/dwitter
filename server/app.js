@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import 'express-async-error'
+import { Server } from 'socket.io'
 
 /* Router */
 import tweetsRouter from './router/tweets.js'
@@ -37,5 +38,17 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-app.listen(config.host.port)
+const server = app.listen(config.host.port)
+const socketIO = new Server(server, {
+    cors: {
+        origin: '*',
+    }
+})
 
+socketIO.on('connection', (socket) => {
+    console.log('Client here!')
+})
+
+setInterval(() => {
+    socketIO.emit('dwitter', 'Hello')
+}, 1000)
