@@ -11,6 +11,7 @@ import { Server } from 'socket.io'
 import tweetsRouter from './router/tweets.js'
 import authRouter from './router/auth.js'
 import { config } from './config.js'
+import { initSocket } from './connection/socket.js'
 
 const app = express()
 
@@ -39,16 +40,5 @@ app.use((error, req, res, next) => {
 })
 
 const server = app.listen(config.host.port)
-const socketIO = new Server(server, {
-    cors: {
-        origin: '*',
-    }
-})
-
-socketIO.on('connection', (socket) => {
-    console.log('Client here!')
-})
-
-setInterval(() => {
-    socketIO.emit('dwitter', 'Hello')
-}, 1000)
+// 소켓 연결
+initSocket(server)

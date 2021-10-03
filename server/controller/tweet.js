@@ -1,4 +1,5 @@
 import * as tweetRepository from '../data/tweet.js'
+import { getSocketIO } from '../connection/socket.js'
 
 export async function getTweets(req, res) {
     const username = req.query.username
@@ -24,6 +25,8 @@ export async function createTweet(req, res, next) {
     const userId = req.user_id
     const tweet = await tweetRepository.create(userId, text)
     res.status(201).json(tweet)
+    // 소켓에게 tweets 카테고리에 새로만들어진 tweet을 Boradcast 해준다.
+    getSocketIO().emit('tweets', tweet)
 }
 
 export async function updateTweet(req, res, next) {
