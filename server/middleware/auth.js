@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { config } from '../config.js'
 import * as userRepository from '../data/user.js'
 
 const AUTH_ERROR = { message: 'Autentication Error'}
@@ -10,8 +11,9 @@ export const isAuth = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1]
-    jwt.verify(token,
-        'Pa$SQo6ycQ0PH7Taswvd$g*TcRNQ0lCN',
+    jwt.verify(
+        token,
+        config.jwt.secretKey,
         async (error, decoded) => {
             if (error) {
                 return res.status(401).json(AUTH_ERROR)

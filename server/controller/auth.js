@@ -1,6 +1,9 @@
 import * as userRepository from '../data/user.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { config } from '../config.js'
+
+const jwtSecretKey = process.env.JWT_SECRET
 
 export async function signup(req, res) {
     const { 
@@ -71,15 +74,16 @@ function createUserJwtPayload(userId) {
 }
 
 function createJwtToken(payload, options) {
-    const secret = 'Pa$SQo6ycQ0PH7Taswvd$g*TcRNQ0lCN' // 권장되는 길이는 32byte
-    return jwt.sign(payload, secret,
+    return jwt.sign(
+        payload,
+        config.jwt.secretKey,
         {
             ...options,
-            expiresIn: '2d' // 2일
+            expiresIn: config.jwt.expiresInSec
         }
     )
 }
 
 function bcryptPassword(password) {
-    return bcrypt.hashSync(password, 10)
+    return bcrypt.hashSync(password, config.bcrypt.saltRounds)
 }
