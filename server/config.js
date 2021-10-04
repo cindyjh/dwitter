@@ -24,7 +24,9 @@ export const config = {
         port: parseInt(required('HOST_PORT', 8080)),
     },
     db: {
+        dialect: required('DB_DIALECT', 'mysql'),
         host: required('DB_HOST'),
+        port: parseInt(required('DB_PORT', 3306)),
         user: required('DB_USER'),
         database: required('DB_DATABASE'),
         password: required('DB_PASSWORD'),
