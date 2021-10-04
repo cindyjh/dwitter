@@ -14,8 +14,6 @@ export default class TweetService {
 
   async postTweet(text) {
     const tweet = {
-      name: 'Cindy',
-      username: 'cindy',
       text,
     };
     
