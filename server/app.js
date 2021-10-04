@@ -12,7 +12,7 @@ import tweetsRouter from './router/tweets.js'
 import authRouter from './router/auth.js'
 import { config } from './config.js'
 import { initSocket } from './connection/socket.js'
-import { db } from './db/database.js'
+import { db, sequelize } from './db/database.js'
 
 const app = express()
 
@@ -40,13 +40,8 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-try {
-    await db.authenticate();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-}
-
-const server = app.listen(config.host.port)
-// 소켓 연결
-initSocket(server)
+sequelize.sync().then((client) => {
+    const server = app.listen(config.host.port)
+    // 소켓 연결
+    initSocket(server)
+})
