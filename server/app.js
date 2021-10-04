@@ -40,12 +40,6 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-db.getConnection().then(console.log)
-
-// db.on('connection', (stream) => {
-//     console.log('mysql connected')
-// })
-
 const server = app.listen(config.host.port)
 // 소켓 연결
 initSocket(server)

@@ -21,7 +21,7 @@ export async function signup(req, res) {
         })
     }
     const hashed = bcryptPassword(password)
-    const user = await userRepository.create({
+    const userId = await userRepository.create({
         username,
         password: hashed,
         name,
@@ -29,7 +29,7 @@ export async function signup(req, res) {
         url
     })
 
-    const token = createJwtToken(createUserJwtPayload(user.id))
+    const token = createJwtToken(createUserJwtPayload(userId))
     res.status(201).json({ token, username })
 }
 
