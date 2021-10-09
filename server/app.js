@@ -5,13 +5,13 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import 'express-async-error'
-import { Server } from 'socket.io'
 
 /* Router */
 import tweetsRouter from './router/tweets.js'
 import authRouter from './router/auth.js'
 import { config } from './config.js'
 import { initSocket } from './connection/socket.js'
+import { connectDB } from './database/database.js'
 
 const app = express()
 
@@ -39,6 +39,10 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-const server = app.listen(config.host.port)
-// 소켓 연결
-initSocket(server)
+connectDB()
+    .then(db => {
+        console.log('init!', db)
+        const server = app.listen(config.host.port)
+        initSocket(server) // 소켓 연결
+    })
+    .catch(console.error)
