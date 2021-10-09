@@ -1,75 +1,90 @@
-import * as userRepository from './user.js'
-let tweets = [
-    {
-        id: 1,
-        text: '첫 번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 1,
+import SQ from 'sequelize'
+import { sequelize } from "../db/database.js"
+import { User } from './user.js'
+
+const DataTypes = SQ.DataTypes
+const Sequelize = SQ.Sequelize
+
+const Tweet = sequelize.define('tweet', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        unique: true,
+        autoIncrement: true,
+        allowNull: false,
     },
-    {
-        id: 2,
-        text: '두번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 1,
+    text: {
+        type: DataTypes.TEXT,
+        allowNull: false,
     },
-    {
-        id: 3,
-        text: '세번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 2,
+
+}, {
+    // don't forget to enable timestamps!
+    timestamps: true,
+})
+
+Tweet.belongsTo(User)
+
+const INCLUDE_USER = {
+    attributes: [
+        'id',
+        'text',
+        'createdAt',
+        'userId',
+        [ Sequelize.col('user.name'), 'name' ],
+        [ Sequelize.col('user.username'), 'username' ],
+        [ Sequelize.col('user.url'), 'url' ],
+    ],
+    include: {
+        model: User,
+        attributes: []
     },
-]
+}
+
+const ORDER_DESC = {
+    order: [['createdAt', 'DESC']]
+}
 
 export async function getAll() {
-    return Promise.all(
-        tweets.map(async (tweet) => {
-            return appendUserInfo(tweet)
-        })
-    )
+    return Tweet.findAll({
+        ...INCLUDE_USER,
+        ...ORDER_DESC
+    })
 }
 
 export async function getAllByUsername(username) {
-    const user = await userRepository.findByUsername(username)
-    const filteredTweets = tweets.filter(tweet => tweet.userId === user.id)
-    return Promise.all(
-        filteredTweets.map(async (tweet) => {
-            return appendUserInfo(tweet)
-        })
-    )
+    return Tweet.findAll({
+        ...INCLUDE_USER,
+        ...ORDER_DESC, 
+        include: {
+            ...INCLUDE_USER.include, where: { username },
+        },
+    })
 }
 
 export async function getById(id) {
-    const findedTweet = tweets.find(tweet => tweet.id === id)
-    return appendUserInfo(findedTweet)
+    return Tweet.findOne({
+        where: {id},
+        ...INCLUDE_USER,
+    })
 }
 
 export async function create(userId, text) {
-    const tweet = {
-        id: Math.max(...tweets.map(tweet => tweet.id)) + 1,
-        text,
-        createdAt: new Date().toString(),
-        userId,
-    }
-    tweets = [tweet, ...tweets] // tweets 앞에 추가를 해준다.
-    return appendUserInfo(tweet)
+    return Tweet.create({ text, userId })
+        .then(data => this.getById(data.dataValues.id))
 }
 
 export async function update(id, text) {
-    const tweet = tweets.find(tweet => tweet.id === id) 
-    if (tweet) {
-        tweet.text = text
-    }
-    return appendUserInfo(tweet)
+    return Tweet.findByPk(id, INCLUDE_USER)
+        .then(tweet => {
+            tweet.text = text
+            return tweet.save()
+        })
 }
 
 export async function removes(id) {
-    tweets = tweets.filter(tweet => tweet.id !== id)
-}
-
-async function appendUserInfo(tweet) {
-    const userId = tweet.userId
-    const { username, name, url} = await userRepository.findById(userId)
-    return {
-        ...tweet, username, name, url
-    }
+    return Tweet.findByPk(id)
+        .then(tweet => {
+            tweet.destroy()
+        })
 }

@@ -1,37 +1,51 @@
-let users = [
-    {
-        id: 1,
-        username: 'cindy',
-        name: '주희',
-        password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
-        createdAt: new Date().toString(),
+import SQ from 'sequelize'
+import { sequelize } from "../db/database.js"
+
+const DataTypes = SQ.DataTypes
+export const User = sequelize.define('user', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        unique: true,
+        autoIncrement: true,
+        allowNull: false,
     },
-    {
-        id: 2,
-        username: 'cindy2',
-        name: '주희2',
-        password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
-        createdAt: new Date().toString(),
-    }
-]
+    username: {
+        type: DataTypes.STRING(45),
+        unique: true,
+        allowNull: false,
+    },
+    password: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+    },
+    name: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+    },
+    url: DataTypes.TEXT,
+}, {
+    // don't forget to enable timestamps!
+    timestamps: true,
+})
 
 export async function findByUsername(username) {
-    return users.find(user => user.username === username)
+    return User.findOne({ where: {
+        username
+    }})
 }
 
 export async function findById(id) {
-    return users.find(user => user.id === id)
+    return User.findByPk(id)
 }
 
-export async function create(userInfo) {
-    const user = {
-        id: Math.max(...users.map(user => user.id)) + 1,
-        ...userInfo,
-        createdAt: new Date().toString(),
-        updatedAt: new Date().toString(),
-    }
-
-    users.push(user)
-    return user
+export async function create(user) {
+    return User.create(user).then(data => {
+        return data.dataValues.id
+    })
 }
 

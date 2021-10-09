@@ -5,14 +5,13 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import 'express-async-error'
-import { Server } from 'socket.io'
 
 /* Router */
 import tweetsRouter from './router/tweets.js'
 import authRouter from './router/auth.js'
 import { config } from './config.js'
 import { initSocket } from './connection/socket.js'
-import { db } from './db/database.js'
+import { sequelize } from './db/database.js'
 
 const app = express()
 
@@ -40,12 +39,8 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-db.getConnection().then(console.log)
-
-// db.on('connection', (stream) => {
-//     console.log('mysql connected')
-// })
-
-const server = app.listen(config.host.port)
-// 소켓 연결
-initSocket(server)
+sequelize.sync().then((client) => {
+    const server = app.listen(config.host.port)
+    // 소켓 연결
+    initSocket(server)
+})
