@@ -1,75 +1,66 @@
 import * as userRepository from './user.js'
-let tweets = [
-    {
-        id: 1,
-        text: '첫 번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 1,
-    },
-    {
-        id: 2,
-        text: '두번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 1,
-    },
-    {
-        id: 3,
-        text: '세번째 트윗 입니다!',
-        createdAt: new Date().toString(),
-        userId: 2,
-    },
-]
+import MongoDB from 'mongodb'
+import { getTweets } from '../database/database.js'
+
+const ObjectId = MongoDB.ObjectId
 
 export async function getAll() {
-    return Promise.all(
-        tweets.map(async (tweet) => {
-            return appendUserInfo(tweet)
-        })
-    )
+    return getTweets()
+        .find()
+        .sort({createdAt: -1})
+        .toArray()
+        .then(mapTweets)
 }
 
 export async function getAllByUsername(username) {
-    const user = await userRepository.findByUsername(username)
-    const filteredTweets = tweets.filter(tweet => tweet.userId === user.id)
-    return Promise.all(
-        filteredTweets.map(async (tweet) => {
-            return appendUserInfo(tweet)
-        })
-    )
+    return getTweets()
+        .find({ username })
+        .sort({createdAt: -1})
+        .toArray()
+        .then(mapTweets)
 }
 
 export async function getById(id) {
-    const findedTweet = tweets.find(tweet => tweet.id === id)
-    return appendUserInfo(findedTweet)
+    return getTweets()
+        .findOne({ _id: new ObjectId(id) })
+        .then(mapOptionalTweet)
 }
 
 export async function create(userId, text) {
+    const { username, name, url } = await userRepository.findById(userId)
     const tweet = {
-        id: Math.max(...tweets.map(tweet => tweet.id)) + 1,
         text,
-        createdAt: new Date().toString(),
         userId,
+        username,
+        name,
+        url,
+        createdAt: new Date().toString(),
     }
-    tweets = [tweet, ...tweets] // tweets 앞에 추가를 해준다.
-    return appendUserInfo(tweet)
+
+    return getTweets()
+        .insertOne(tweet)
+        .then((data) => mapOptionalTweet({ ...tweet, _id: data.insertedId }))
 }
 
 export async function update(id, text) {
-    const tweet = tweets.find(tweet => tweet.id === id) 
-    if (tweet) {
-        tweet.text = text
-    }
-    return appendUserInfo(tweet)
+    const filter = { _id: new ObjectId(id) }
+    const updateDoc = { $set: { text } }
+    const options = { returnDocument: 'after' }
+    return getTweets()
+        .findOneAndUpdate(filter, updateDoc, options)
+        .then(result => result.value)
+        .then(mapOptionalTweet)
 }
 
 export async function removes(id) {
-    tweets = tweets.filter(tweet => tweet.id !== id)
+    return getTweets()
+        .deleteOne({ _id: new ObjectId(id) })
 }
 
-async function appendUserInfo(tweet) {
-    const userId = tweet.userId
-    const { username, name, url} = await userRepository.findById(userId)
-    return {
-        ...tweet, username, name, url
-    }
+function mapTweets(tweets) {
+    return tweets.map(mapOptionalTweet)
+}
+
+function mapOptionalTweet(tweet) {
+    return tweet ? { ...tweet, id: tweet._id.toString() } : tweet
 }

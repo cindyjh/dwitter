@@ -11,7 +11,7 @@ export async function getTweets(req, res) {
 }
 
 export async function getTweet(req, res, next) {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     const tweet = await tweetRepository.getById(id)
     if (tweet) {
         res.status(200).send(tweet)
@@ -30,7 +30,7 @@ export async function createTweet(req, res, next) {
 }
 
 export async function updateTweet(req, res, next) {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     const { text } = req.body
     const userId = req.user_id
     const tweet = await tweetRepository.getById(id)
@@ -49,7 +49,7 @@ export async function updateTweet(req, res, next) {
 
 export async function deleteTweet(req, res, next) {
     // TODO: data를 완전히 지우는게 아니라 deleted_at을 넣어서 soft delete를 해주면 더 좋겠다.
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     const userId = req.user_id
 
     const tweet = await tweetRepository.getById(id)
