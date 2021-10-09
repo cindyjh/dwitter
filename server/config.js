@@ -25,5 +25,6 @@ export const config = {
     },
     db: {
         host: required('DB_HOST'),
+        db: required('DB_DATABASE'),
     },
 }

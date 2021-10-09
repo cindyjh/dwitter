@@ -1,37 +1,25 @@
-let users = [
-    {
-        id: 1,
-        username: 'cindy',
-        name: '주희',
-        password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
-        createdAt: new Date().toString(),
-    },
-    {
-        id: 2,
-        username: 'cindy2',
-        name: '주희2',
-        password: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNpbmR5IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTYzMjY1MzYyM30.ZvmhQ-ytESfZ82DiKjqf37pEMdgKq-v00pFmaJK81bk',
-        createdAt: new Date().toString(),
-    }
-]
+import { getUsers } from "../database/database.js"
+import MongoDB from 'mongodb'
+
+const ObjectId = MongoDB.ObjectId
 
 export async function findByUsername(username) {
-    return users.find(user => user.username === username)
+    return getUsers()
+        .findOne({ username })
+        .then(mapOptionalUser)
 }
 
 export async function findById(id) {
-    return users.find(user => user.id === id)
+    return getUsers()
+        .findOne({ _id: new ObjectId(id) })
+        .then(mapOptionalUser)
 }
 
 export async function create(userInfo) {
-    const user = {
-        id: Math.max(...users.map(user => user.id)) + 1,
-        ...userInfo,
-        createdAt: new Date().toString(),
-        updatedAt: new Date().toString(),
-    }
-
-    users.push(user)
-    return user
+    return getUsers().insertOne(userInfo)
+        .then((data) => data.insertedId.toString())
 }
 
+function mapOptionalUser(user) { // user는 null일 수도 있으므로 Optional 이라는 키워드를 붙여주었다.
+    return user ? { ...user, id: user._id } : user
+}
