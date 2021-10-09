@@ -1,15 +1,15 @@
 import { useVirtualId } from "../database/database.js"
 import Mongoose from 'mongoose'
 
-const userSchema = new Mongoose.Schema({
-    username: { type: String, required: true, index: true, unique: true, trim: true },
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
-    password: { type: String, required: true, trim: true },
-    url: { type: String, trim: true },
-    createdAt: { type: Date, default: Date.now},
-    updatedAt: { type: Date, default: Date.now},
-});
+const userSchema = new Mongoose.Schema(
+    {
+        username: { type: String, required: true, index: true, unique: true, trim: true },
+        name: { type: String, required: true, trim: true },
+        email: { type: String, required: true, trim: true },
+        password: { type: String, required: true, trim: true },
+        url: { type: String, trim: true },
+    }, { timestamps: true }
+)
 
 useVirtualId(userSchema)
 const User = Mongoose.model('User', userSchema)
