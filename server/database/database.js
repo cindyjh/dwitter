@@ -1,5 +1,4 @@
-
-import MongoDB from 'mongodb'
+import Mongoose from 'mongoose'
 import { config } from "../config.js"
 
 // NoSQL 은 관계를 가지는 것 보다 정보의 중복을 더 선호한다.
@@ -12,17 +11,28 @@ import { config } from "../config.js"
 
 const { host, database } = config.db
 
-let db
 export async function connectDB() {
-    return MongoDB.MongoClient.connect(host)
-        .then(client => {
-            db = client.db(database)
-        })
+    return Mongoose.connect(host, {
+        useNewUrlParser: true,
+    })
 }
 
-export function getUsers() {
-    return db.collection('users')
+export function useVirtualId(schema) {
+    // _id 를 id로 읽자
+    // https://mongoosejs.com/docs/guide.html#virtuals
+    // this키워드를 써야 하기 때문에 arrow function을 사용 할 수 없다!!!!
+    // https://medium.com/@lucasdavidferrero/dont-use-arrow-functions-when-you-use-mongoose-schema-method-190b79f1640c
+    schema.virtual('id').get(function() { 
+        return this._id.toString()
+    })
+    // https://mongoosejs.com/docs/guide.html#toJSON
+    schema.set('toJson', { virtuals: true }) 
+    // https://mongoosejs.com/docs/guide.html#toObject
+    schema.set('toObject', { getters: true }) // which converts the mongoose document into a plain JavaScript object
 }
+
+// TODO(cindy): delete blow
+let db
 
 export function getTweets() {
     return db.collection('tweets')

@@ -1,25 +1,30 @@
-import { getUsers } from "../database/database.js"
-import MongoDB from 'mongodb'
+import { useVirtualId } from "../database/database.js"
+import Mongoose from 'mongoose'
 
-const ObjectId = MongoDB.ObjectId
+const userSchema = new Mongoose.Schema({
+    username: { type: String, required: true, index: true, unique: true, trim: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
+    password: { type: String, required: true, trim: true },
+    url: { type: String, trim: true },
+    createdAt: { type: Date, default: Date.now},
+    updatedAt: { type: Date, default: Date.now},
+});
+
+useVirtualId(userSchema)
+const User = Mongoose.model('User', userSchema)
+
 
 export async function findByUsername(username) {
-    return getUsers()
-        .findOne({ username })
-        .then(mapOptionalUser)
+    return User.findOne({ username })
 }
 
 export async function findById(id) {
-    return getUsers()
-        .findOne({ _id: new ObjectId(id) })
-        .then(mapOptionalUser)
+    return User.findById(id)
 }
 
 export async function create(userInfo) {
-    return getUsers().insertOne(userInfo)
-        .then((data) => data.insertedId.toString())
-}
-
-function mapOptionalUser(user) { // user는 null일 수도 있으므로 Optional 이라는 키워드를 붙여주었다.
-    return user ? { ...user, id: user._id.toString() } : user
+    return new User(userInfo)
+        .save()
+        .then(data => data.id)
 }
