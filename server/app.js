@@ -16,8 +16,12 @@ import { sequelize } from './db/database.js'
 const app = express()
 
 /* Middleware */
+const corsOption = {
+    origin: config.cors.allowedOrigin,
+    optionsSuccessStatus: 200,
+}
 app.use(cookieParser())
-app.use(cors()) // CORS 허용
+app.use(cors(corsOption)) // CORS 허용
 app.use(helmet()) // 보안에 필요한 헤더들을 추가해준다.
 app.use(morgan('combined')) // 사용자에게 요청을 받을 때마다 어떤 요청을 받았는지, 얼마나 걸렸는지에 관한 유용한 정보를 자동으로 로그로 남겨준다.
 app.use(express.json()) // REST API Request 를 json 형식 body로 parse
@@ -39,8 +43,9 @@ app.use((error, req, res, next) => {
     res.sendSatus(500)
 })
 
-sequelize.sync().then((client) => {
-    const server = app.listen(config.host.port)
+sequelize.sync().then(() => {
+    console.log(`Server is started... ${new Date()}`)
+    const server = app.listen(config.port)
     // 소켓 연결
     initSocket(server)
 })

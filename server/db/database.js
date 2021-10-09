@@ -6,5 +6,6 @@ export const sequelize = new SQ.Sequelize(database, user, password, {
     host,
     dialect,
     port,
+    logging: false,
     // logging: (...msg) => console.log(msg), // Displays all log function call parameters
 })
