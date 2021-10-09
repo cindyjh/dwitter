@@ -21,5 +21,5 @@ export async function create(userInfo) {
 }
 
 function mapOptionalUser(user) { // user는 null일 수도 있으므로 Optional 이라는 키워드를 붙여주었다.
-    return user ? { ...user, id: user._id } : user
+    return user ? { ...user, id: user._id.toString() } : user
 }
