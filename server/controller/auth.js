@@ -74,6 +74,16 @@ export async function me(req, res) {
     res.status(200).json({ token: req.token, username: user.username })
 }
 
+export async function csrfToken(req, res, next) {
+    const csrfToken = await generateCSRFToken()
+    res.status(200).json({ csrfToken })
+}
+
+async function generateCSRFToken() {
+    // salt round를 줘서 랜덤한 해시코드를 주도록 한다.
+    return bcrypt.hash(config.csrf.plainToken, 1)
+}
+
 function createUserJwtPayload(userId) {
     return {
         id: userId

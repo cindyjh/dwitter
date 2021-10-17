@@ -36,4 +36,7 @@ router.post('/logout', authController.logout)
 // GET /auth/me
 router.get('/me', isAuth, authController.me)
 
+// GET /auth/csrf-token
+router.get('/csrf-token', authController.csrfToken)
+
 export default router
