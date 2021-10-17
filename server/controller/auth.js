@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { config } from '../config.js'
 
+const AUTH_TOKEN_NAME = 'dwitter token'
+
 export async function signup(req, res) {
     const {
         username,
@@ -51,6 +53,11 @@ export async function login(req, res) {
     res.status(200).json({ username, token })
 }
 
+export async function logout(req, res, next) {
+    res.cookie(AUTH_TOKEN_NAME, '')
+    res.status(200).json({ message: 'User has been logged out.' })
+}
+
 /**
  * application이 실행이 될 때 기존에 가지고 있는 token이 있다면 이 token이 유효한지 검증해주는 용도의 API
  * @param {*} req 
@@ -91,7 +98,7 @@ function setToken(res, token) {
         sameSite: 'none', //server와 client가 동일한 도메인이 아니더라도  http only가 동작 할 수 있도록 한다.
         secure: true,
     }
-    res.cookie('dwitter token', token, options)
+    res.cookie(AUTH_TOKEN_NAME, token, options)
 }
 
 function bcryptPassword(password) {

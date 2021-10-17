@@ -28,6 +28,8 @@ export default class AuthService {
   }
 
   async logout() {
-    // TODO
+    return await this.http.fetch('/auth/logout', {
+      method: 'POST',
+    })
   }
 }
