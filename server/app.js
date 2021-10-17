@@ -12,6 +12,7 @@ import authRouter from './router/auth.js'
 import { config } from './config.js'
 import { initSocket } from './connection/socket.js'
 import { sequelize } from './db/database.js'
+import { csrfCheck } from './middleware/csrf.js'
 
 const app = express()
 
@@ -31,6 +32,7 @@ app.use(express.json()) // REST API Request 를 json 형식 body로 parse
 app.use(express.urlencoded({ extended: true })) // HTML Form에서 Submmit을 하게 되면 발생하는 request를 Body 안으로 자동으로 parse 해줌.
 
 /* Routes */
+app.use(csrfCheck)
 app.use('/auth', authRouter) // auth 라우트 등록
 app.use('/tweets', tweetsRouter) // tweets 라우트 등록
 
