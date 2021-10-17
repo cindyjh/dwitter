@@ -1,7 +1,8 @@
 export default class HttpClient {
-    constructor(baseURL, authErrorEventBus) {
+    constructor(baseURL, authErrorEventBus, getCsrfToken) {
         this.baseURL = baseURL
         this.authErrorEventBus = authErrorEventBus
+        this.getCsrfToken = getCsrfToken
     }
 
     async fetch(url, options) {
@@ -10,6 +11,7 @@ export default class HttpClient {
             credentials: 'include', // 자동으로 브라우저가 credential과 관련된 데이터를 추가해서(쿠키에 있는 데이터를 추가해서) 요청을 해준다.
             headers: {
                 'Content-Type': 'application/json',
+                'dwitter-csrf-token': this.getCsrfToken(),
                 ...options.headers
             }
         })
