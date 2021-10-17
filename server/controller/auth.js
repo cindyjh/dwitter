@@ -3,10 +3,8 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { config } from '../config.js'
 
-const jwtSecretKey = process.env.JWT_SECRET
-
 export async function signup(req, res) {
-    const { 
+    const {
         username,
         password,
         name,
@@ -30,6 +28,8 @@ export async function signup(req, res) {
     })
 
     const token = createJwtToken(createUserJwtPayload(userId))
+    setToken(res, token)
+    // body에 token 을 주지 않고 cookie header에만 주면 REST API를 이용하는 브라우저 외의 다른 클라이언트(모바일)는 사용 할 수 없다. 그래서 body에 token을 그대로 둘 것이다.
     res.status(201).json({ token, username })
 }
 
@@ -39,15 +39,15 @@ export async function login(req, res) {
     const user = await userRepository.findByUsername(username)
     if (!user) {
         // user or password로 하는 이유는 보안을 위해서이다.
-        return res.status(401).json({ message: 'Invalid user or password'})
+        return res.status(401).json({ message: 'Invalid user or password' })
     }
     const isValidPassword = await bcrypt.compare(password, user.password)
     if (!isValidPassword) {
-        return res.status(401).json({ message: 'Invalid user or password'})
+        return res.status(401).json({ message: 'Invalid user or password' })
     }
 
     const token = createJwtToken(createUserJwtPayload(user.id))
-
+    setToken(res, token)
     res.status(200).json({ username, token })
 }
 
@@ -82,6 +82,16 @@ function createJwtToken(payload, options) {
             expiresIn: config.jwt.expiresInSec
         }
     )
+}
+
+function setToken(res, token) {
+    const options = { // HTTP-Only 로 설정하자.
+        maxAge: config.jwt.expiresInSec * 1000, // 해당 시간이 지나면 쿠키를 파기
+        httpOnly: true,
+        sameSite: 'none', //server와 client가 동일한 도메인이 아니더라도  http only가 동작 할 수 있도록 한다.
+        secure: true,
+    }
+    res.cookie('dwitter token', token, options)
 }
 
 function bcryptPassword(password) {
