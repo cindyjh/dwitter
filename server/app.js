@@ -13,6 +13,7 @@ import { config } from './config.js'
 import { initSocket } from './connection/socket.js'
 import { sequelize } from './db/database.js'
 import { csrfCheck } from './middleware/csrf.js'
+import rateLimiter from './middleware/rate-limiter.js'
 
 const app = express()
 
@@ -30,6 +31,7 @@ app.use(helmet()) // 보안에 필요한 헤더들을 추가해준다.
 app.use(morgan('combined')) // 사용자에게 요청을 받을 때마다 어떤 요청을 받았는지, 얼마나 걸렸는지에 관한 유용한 정보를 자동으로 로그로 남겨준다.
 app.use(express.json()) // REST API Request 를 json 형식 body로 parse
 app.use(express.urlencoded({ extended: true })) // HTML Form에서 Submmit을 하게 되면 발생하는 request를 Body 안으로 자동으로 parse 해줌.
+app.use(rateLimiter)
 
 /* Routes */
 app.use(csrfCheck)
