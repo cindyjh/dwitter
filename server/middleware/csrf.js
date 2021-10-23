@@ -13,7 +13,7 @@ export const csrfCheck = (req, res, next) => {
     const csrfHeader = req.get('dwitter-csrf-token')
 
     if (!csrfHeader) {
-        console.worn('Missing required "dwitter-csrf-token"', req.headers.origin)
+        console.warn('Missing required "dwitter-csrf-token"', req.headers.origin)
         return res.status(403).json({ message: 'Failed CSRF check' })
     }
 
